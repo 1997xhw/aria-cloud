@@ -1,7 +1,7 @@
 package db
 
 import (
-	mydb "aria-storage/db/mysql"
+	mydb "aria-cloud/db/mysql"
 	"database/sql"
 	"fmt"
 )

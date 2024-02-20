@@ -1,4 +1,4 @@
-module aria-storage
+module aria-cloud
 
 go 1.21
 

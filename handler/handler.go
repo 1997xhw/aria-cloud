@@ -1,8 +1,8 @@
 package handler
 
 import (
-	"aria-storage/meta"
-	"aria-storage/util"
+	"aria-cloud/meta"
+	"aria-cloud/util"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -154,7 +154,7 @@ func FileUpdateMetaHandler(w http.ResponseWriter, r *http.Request) {
 	new_location := strings.Replace(curFileMeta.Location, curFileMeta.FileName, new_filename, 1)
 	err = os.Rename(curFileMeta.Location, new_location)
 	if err != nil {
-		fmt.Println("修改文件名发生错误！！！")
+		fmt.Println("------------------------修改文件名发生错误！！！------------------------")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -197,7 +197,7 @@ func FileDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	curFileMeta := meta.GetFileMeta(fileHash1)
 	err := os.Remove(curFileMeta.Location)
 	if err != nil {
-		fmt.Println("文件删除异常！！！")
+		fmt.Println("------------------------文件删除异常！！！------------------------")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}

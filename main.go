@@ -1,7 +1,7 @@
 package main
 
 import (
-	"aria-storage/handler"
+	"aria-cloud/handler"
 	"fmt"
 	"net/http"
 )
@@ -21,4 +21,7 @@ func router() {
 	http.HandleFunc("/file/download", handler.DownloadHandler)
 	http.HandleFunc("/file/delete", handler.FileDeleteHandler)
 	http.HandleFunc("/file/update", handler.FileUpdateMetaHandler)
+
+	http.HandleFunc("/user/signup", handler.SignupHandler)
+	http.HandleFunc("/user/signin", handler.SignInHandler)
 }

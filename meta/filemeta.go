@@ -1,7 +1,7 @@
 package meta
 
 import (
-	mydb "aria-storage/db"
+	mydb "aria-cloud/db"
 	"fmt"
 )
 
