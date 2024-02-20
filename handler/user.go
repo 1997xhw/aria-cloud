@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 )
 
@@ -70,13 +71,14 @@ func SignInHandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	usename := r.Form.Get("username")
 	password := r.Form.Get("password")
-
 	encPassword := util.Sha1([]byte(password + pwd_salt))
+
 	pwdChecked := db.UserSignin(usename, encPassword)
 	if !pwdChecked {
 		w.Write([]byte("FAILED"))
 		return
 	}
+
 	// 2. 生成访问凭证（token）
 	token := GenToken(usename)
 	udRes := db.UpdateToken(usename, token)
@@ -85,11 +87,92 @@ func SignInHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// 3. 登陆成功后重定向到首页
-	w.Write([]byte("http://" + r.Host + "/static/view/home.html"))
+	//w.Write([]byte("http://" + r.Host + "/static/view/home.html"))
+	resp := util.RespMsg{
+		Code: 0,
+		Msg:  "OK",
+		Data: struct {
+			Location string
+			Username string
+			Token    string
+		}{
+			Location: "http://" + r.Host + "/static/view/home.html",
+			Username: usename,
+			Token:    token,
+		},
+	}
+	fmt.Println(resp.JSONBytes())
+	_, err := w.Write(resp.JSONBytes())
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
 }
+
+func UserInfoHandler(w http.ResponseWriter, r *http.Request) {
+	// 1. 解析请求参数
+	r.ParseForm()
+	username := r.Form.Get("username")
+	token := r.Form.Get("token")
+	// 2. 验证token是否有效
+	if !IsTokenVaild(username, token) {
+		w.WriteHeader(http.StatusForbidden)
+		return
+	}
+	// 3. 查询用户信息
+	userInfo, err := db.GetUserInfo(username)
+	if err != nil {
+		w.WriteHeader(http.StatusForbidden)
+		return
+	}
+	// 4. 组装并且响应用户数据
+	resp := util.RespMsg{
+		Code: 0,
+		Msg:  "OK",
+		Data: userInfo,
+	}
+	_, err = w.Write(resp.JSONBytes())
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+}
+
 func GenToken(username string) string {
 	//40位 md5(username+timestamp+token_salt)+timestamp[:8]
 	timestamp := fmt.Sprintf("%x", time.Now().Unix())
 	tokenPrefix := util.MD5([]byte(username + timestamp + "_tokonsalt"))
 	return tokenPrefix + timestamp[:8]
+}
+
+// IsTokenVaild 验证token
+func IsTokenVaild(username string, token string) bool {
+	if len(token) != 40 {
+		fmt.Println("token is wrong!")
+		return false
+	}
+	// 1. 判断token时效性
+	hexTimestamp := token[len(token)-8:]
+	timestamp, err := strconv.ParseInt(hexTimestamp, 16, 64)
+	if err != nil {
+		fmt.Println("Error converting hex to int:", err)
+		return false
+	}
+	// 将Unix时间戳转换为time.Time
+	tokenTime := time.Unix(timestamp, 0)
+	// 检查token时间是否超过1小时
+	if time.Since(tokenTime).Hours() > 1 {
+		fmt.Printf("token已过期！！")
+		return false
+	}
+
+	// 2. 从数据表tbl_user_token查询username对应的token信息
+	dbToken, _ := db.GetTokenByUsername(username)
+	// 3. 对比两个token是否一致
+	if dbToken != token {
+		fmt.Println("token不一致！！！")
+		return false
+	}
+
+	return true
 }

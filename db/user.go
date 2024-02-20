@@ -2,6 +2,7 @@ package db
 
 import (
 	mydb "aria-cloud/db/mysql"
+	"database/sql"
 	"fmt"
 )
 
@@ -71,4 +72,53 @@ func UpdateToken(username string, token string) bool {
 		return false
 	}
 	return true
+}
+
+func GetTokenByUsername(username string) (string, error) {
+	row, err := mydb.DBConn().Prepare(
+		`select user_token from tbl_user_token where user_name=? limit 1`)
+	if err != nil {
+		fmt.Println("获取token时发生错误: ", err.Error())
+		return "", err
+	}
+	defer row.Close()
+	var token string
+	err = row.QueryRow(username).Scan(&token)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			// 处理没有找到结果的情况
+			return "", fmt.Errorf("没有找到对应的token")
+		}
+		// 处理其他可能的错误
+		return "", fmt.Errorf("查询token时发生错误: %v", err)
+	}
+	return token, nil
+}
+
+type User struct {
+	Username     string
+	email        string
+	Phone        string
+	SignupAt     string
+	LastActiveAt string
+	Status       int
+}
+
+func GetUserInfo(username string) (User, error) {
+	user := User{}
+	row, err := mydb.DBConn().Prepare("select user_name,signup_at from tbl_user where user_name=? limit 1")
+	if err != nil {
+		if err == sql.ErrNoRows {
+			// 处理没有找到结果的情况
+			return user, fmt.Errorf("没有找到对应的UserInfo")
+		}
+		return user, fmt.Errorf(err.Error())
+	}
+	defer row.Close()
+	err = row.QueryRow(username).Scan(&user.Username, &user.SignupAt)
+	if err != nil {
+		return user, err
+	}
+
+	return user, nil
 }

@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"aria-cloud/db"
 	"aria-cloud/meta"
 	"aria-cloud/util"
 	"encoding/json"
@@ -8,6 +9,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -25,7 +27,7 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 		//接收文件流及存储到本地目录
 		file, head, err := r.FormFile("file")
 		if err != nil {
-			fmt.Println("Failed to get data, err:%s\n", err.Error())
+			fmt.Printf("Failed to get data, err:%s\n", err.Error())
 			return
 		}
 		defer file.Close()
@@ -40,14 +42,14 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 		//创建一个新的文件等待复制
 		newFile, err := os.Create(fileMeta.Location)
 		if err != nil {
-			fmt.Println("Failed to newFile file:%s", err.Error())
+			fmt.Printf("Failed to newFile file:%s", err.Error())
 			return
 		}
 		defer newFile.Close()
 
 		fileMeta.FileSize, err = io.Copy(newFile, file)
 		if err != nil {
-			fmt.Println("Failed to save data into file:%s\n", err.Error())
+			fmt.Printf("Failed to save data into file:%s\n", err.Error())
 			return
 		}
 
@@ -206,4 +208,25 @@ func FileDeleteHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 
+}
+
+// FileQueryHandler : 查询批量的文件元信息
+func FileQueryHandler(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+
+	limitCnt, _ := strconv.Atoi(r.Form.Get("limit"))
+	username := r.Form.Get("username")
+	//fileMetas, _ := meta.GetLastFileMetasDB(limitCnt)
+	userFiles, err := db.QueryUserFileMetas(username, limitCnt)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	data, err := json.Marshal(userFiles)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.Write(data)
 }
