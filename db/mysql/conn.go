@@ -23,10 +23,41 @@ func init() {
 		log.Fatalln("Failed to connect to mysql, err:" + err.Error())
 		os.Exit(1)
 	}
-	fmt.Println("------------------------success connect to airia!!!")
+	fmt.Println("------------------------success connect to airia!!!------------------------")
 
 }
 
 func DBConn() *sql.DB {
 	return db
+}
+
+func ParseRows(rows *sql.Rows) []map[string]interface{} {
+	cols, _ := rows.Columns()
+	scanArgs := make([]interface{}, len(cols))
+	values := make([]interface{}, len(cols))
+	for j := range values {
+		scanArgs[j] = &values[j]
+	}
+
+	record := make(map[string]interface{})
+	records := make([]map[string]interface{}, 0)
+	for rows.Next() {
+		err := rows.Scan(scanArgs...)
+		checkErr(err)
+
+		for i, col := range values {
+			if col != nil {
+				record[cols[i]] = col
+			}
+		}
+		records = append(records, record)
+	}
+	return records
+}
+
+func checkErr(err error) {
+	if err != nil {
+		log.Fatal(err)
+		panic(err)
+	}
 }
