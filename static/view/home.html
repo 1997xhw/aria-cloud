@@ -118,7 +118,8 @@
           cell.innerHTML = data[i].FileName;
 
           cell = x.insertCell();
-          cell.innerHTML = data[i].FileSize;
+          // cell.innerHTML = data[i].FileSize;
+          cell.innerHTML = (data[i].FileSize / 1024 / 1024).toFixed(2)+ " MB";
 
           cell = x.insertCell();
           cell.innerHTML = data[i].UploadAt;

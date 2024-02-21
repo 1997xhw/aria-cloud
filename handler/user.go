@@ -101,7 +101,7 @@ func SignInHandler(w http.ResponseWriter, r *http.Request) {
 			Token:    token,
 		},
 	}
-	fmt.Println(resp.JSONBytes())
+	//fmt.Println(resp.JSONBytes())
 	_, err := w.Write(resp.JSONBytes())
 	if err != nil {
 		fmt.Println(err.Error())

@@ -57,11 +57,20 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 		fileMeta.FileSha1 = util.FileSha1(newFile)
 		//meta.UpdateFileMeta(fileMeta)
 		_ = meta.UpdateFileMetaDB(fileMeta)
-		fmt.Println(
-			"生成的文件元信息:",
-			fileMeta,
-		)
-		http.Redirect(w, r, "/file/upload/suc", http.StatusFound)
+
+		//TODO 更新用户文件表的记录
+		r.ParseForm()
+		username := r.Form.Get("username")
+		finished := db.OnUserFileUploadFinished(username, fileMeta.FileSha1, fileMeta.FileName, fileMeta.FileSize)
+		if !finished {
+			w.Write([]byte("Upload Failed"))
+		} else {
+			fmt.Println(
+				"成功生成的文件元信息:",
+				fileMeta,
+			)
+			http.Redirect(w, r, "/static/view/home.html", http.StatusFound)
+		}
 	}
 }
 
