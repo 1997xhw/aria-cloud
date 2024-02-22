@@ -182,7 +182,7 @@ func IsTokenVaild(username string, token string) bool {
 	// 将Unix时间戳转换为time.Time
 	tokenTime := time.Unix(timestamp, 0)
 	// 检查token时间是否超过1小时
-	if time.Since(tokenTime).Hours() > 1 {
+	if time.Since(tokenTime).Hours() > 2 {
 		fmt.Printf("token已过期！！")
 		return false
 	}

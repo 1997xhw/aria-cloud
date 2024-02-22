@@ -34,6 +34,11 @@ func LoadServerConfig() ServerConfig {
 	if err != nil {
 		log.Fatal(2, "Fail to parse 'conf/app.ini': %v", err)
 	}
+	app, err := Cfg.GetSection("app")
+	if err != nil {
+		log.Fatal(2, "Fail to get section 'app': %v", err)
+	}
+
 	//server配置节点读取
 	server, err := Cfg.GetSection("server")
 	if err != nil {
@@ -73,6 +78,7 @@ func LoadServerConfig() ServerConfig {
 		AccessKeySecret: oss.Key("ACCESS_KEY_SECRET").MustString(""),
 		Endpoint:        oss.Key("END_POINT").MustString(""),
 		BucketName:      oss.Key("BUCKET_NAME").MustString(""),
+		UploadLocation:  app.Key("LOCATION").MustString(""),
 	}
 
 	return Config

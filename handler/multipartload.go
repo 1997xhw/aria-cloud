@@ -3,6 +3,7 @@ package handler
 import (
 	"aria-cloud/cache/redis"
 	"aria-cloud/db"
+	ini "aria-cloud/lib"
 	"aria-cloud/util"
 	"fmt"
 	redi "github.com/garyburd/redigo/redis"
@@ -48,24 +49,37 @@ func InitialMultipartUploadHandler(w http.ResponseWriter, r *http.Request) {
 		ChunkCount: int(math.Ceil(float64(filesize) / (5 * 1024 * 1024))),
 	}
 	// 4 将初始化信息写入到redis缓存
-	redisConn.Do("HSET", "MP_"+upInfo.UploadID, "chunkcount", upInfo.ChunkCount)
-	redisConn.Do("HSET", "MP_"+upInfo.UploadID, "filehash", upInfo.Filehash)
-	redisConn.Do("HSET", "MP_"+upInfo.UploadID, "filesize", upInfo.FileSize)
+	_, err = redisConn.Do("HSET", "MP_"+upInfo.UploadID, "chunkcount", upInfo.ChunkCount)
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+	_, err = redisConn.Do("HSET", "MP_"+upInfo.UploadID, "filehash", upInfo.Filehash)
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+	_, err = redisConn.Do("HSET", "MP_"+upInfo.UploadID, "filesize", upInfo.FileSize)
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
 	// 将响应初始化数据返回到客户端
 	w.Write(util.NewRespMsg(0, "OK", upInfo).JSONBytes())
 }
 
 func UploadPartHandler(w http.ResponseWriter, r *http.Request) {
+	//conf := ini.LoadServerConfig()
 	// 1 解析用户请求参数
 	r.ParseForm()
-	//username := r.Form.Get("usename")
+	fileto := r.Form.Get("fileto")
 	uploadID := r.Form.Get("uploadid")
 	chunkIndex := r.Form.Get("index")
 	// 2 获得redis链接池的链接
 	redisConn := redis.RedisPool().Get()
 	defer redisConn.Close()
 	// 3 获得文件句柄，用于存储内容
-	fpath := "/data/" + uploadID + "/" + chunkIndex
+	fpath := fileto + uploadID + "/" + chunkIndex
 	os.MkdirAll(path.Dir(fpath), 0755)
 	create, err := os.Create(fpath)
 	if err != nil {
@@ -89,6 +103,7 @@ func UploadPartHandler(w http.ResponseWriter, r *http.Request) {
 
 // 通知上传合并
 func CompleteUploadHandler(w http.ResponseWriter, r *http.Request) {
+	conf := ini.LoadServerConfig()
 	// 1 解析请求参数
 	r.ParseForm()
 	upid := r.Form.Get("uploadid")
@@ -127,7 +142,7 @@ func CompleteUploadHandler(w http.ResponseWriter, r *http.Request) {
 	// 4 TODO 合并分块
 	// 4.1 创建或打开目标文件
 	//outputFile, err := os.Create("/data/" + upid + "/complete")
-	filedir := "/data/" + filename
+	filedir := filename
 	outputFile, err := os.Create(filedir)
 	if err != nil {
 		w.Write(util.NewRespMsg(-1, "合并文件时发生异常："+err.Error(), nil).JSONBytes())
@@ -136,8 +151,8 @@ func CompleteUploadHandler(w http.ResponseWriter, r *http.Request) {
 	defer outputFile.Close()
 
 	// 4.2 按顺序读取每一个分块
-	for i := 0; i < totalCnt; i++ {
-		chunkFile, err := os.Open(fmt.Sprintf("/data/%s/%d", upid, i))
+	for i := 1; i <= totalCnt; i++ {
+		chunkFile, err := os.Open(fmt.Sprintf(conf.UploadLocation+username+"/%s/%d", upid, i))
 		if err != nil {
 			w.Write(util.NewRespMsg(-1, fmt.Sprintf("读取文件块 %d 时发生异常：%v", i, err.Error()), nil).JSONBytes())
 			return
