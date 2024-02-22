@@ -2,6 +2,7 @@ package handler
 
 import (
 	"aria-cloud/db"
+	ini "aria-cloud/lib"
 	"aria-cloud/meta"
 	"aria-cloud/util"
 	"encoding/json"
@@ -24,6 +25,8 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		io.WriteString(w, string(data))
 	} else if r.Method == "POST" {
+		r.ParseForm()
+		username := r.Form.Get("username")
 		//接收文件流及存储到本地目录
 		file, head, err := r.FormFile("file")
 		if err != nil {
@@ -31,11 +34,12 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		defer file.Close()
+		conf := ini.LoadServerConfig()
 		fileMeta := meta.FileMeta{
 			FileSha1: "",
 			FileName: head.Filename,
 			FileSize: 0,
-			Location: "./tmp/" + head.Filename,
+			Location: conf.UploadLocation + username + "/" + head.Filename,
 			UploadAt: time.Now().Format("2006-06-06 15-04:05"),
 		}
 
@@ -58,9 +62,8 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 		//meta.UpdateFileMeta(fileMeta)
 		_ = meta.UpdateFileMetaDB(fileMeta)
 
-		//TODO 更新用户文件表的记录
-		r.ParseForm()
-		username := r.Form.Get("username")
+		//TODO 更新用户文件表的记录☑
+
 		finished := db.OnUserFileUploadFinished(username, fileMeta.FileSha1, fileMeta.FileName, fileMeta.FileSize)
 		if !finished {
 			w.Write([]byte("Upload Failed"))

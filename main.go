@@ -2,8 +2,10 @@ package main
 
 import (
 	"aria-cloud/handler"
+	ini "aria-cloud/lib"
 	"fmt"
 	"net/http"
+	"strconv"
 )
 
 func main() {
@@ -13,7 +15,8 @@ func main() {
 		http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 
 	router()
-	err := http.ListenAndServe(":8080", nil)
+	conf := ini.LoadServerConfig()
+	err := http.ListenAndServe(":"+strconv.Itoa(conf.HTTPPort), nil)
 	if err != nil {
 		fmt.Printf("Fail to start server, err:%v\n", err.Error())
 	}
