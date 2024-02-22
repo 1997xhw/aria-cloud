@@ -16,7 +16,7 @@ type UserFile struct {
 	LastUpdated string
 }
 
-// QueryUserFileMetas : 批量获取用户文件信息
+// QueryUserFileMetas  批量获取用户文件信息
 func QueryUserFileMetas(username string, limit int) ([]UserFile, error) {
 	stmt, err := mydb.DBConn().Prepare(
 		"select file_sha1,file_name,file_size,upload_at," +

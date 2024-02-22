@@ -56,11 +56,11 @@ func RemoveFileMeta(fileSha1 string) {
 	delete(fileMetas, fileSha1)
 }
 
-func GetFileMetaDB(filesha1 string) (FileMeta, error) {
+func GetFileMetaDB(filesha1 string) (*FileMeta, error) {
 	tfile, err := mydb.GetFileMeta(filesha1)
 	if err != nil {
 		fmt.Println("GetFileMetaDB Error! ", err.Error())
-		return FileMeta{}, err
+		return nil, err
 	}
 	fmeta := FileMeta{
 		FileSha1: tfile.FileHash,
@@ -68,5 +68,5 @@ func GetFileMetaDB(filesha1 string) (FileMeta, error) {
 		FileSize: tfile.FileSize.Int64,
 		Location: tfile.FileAddr.String,
 	}
-	return fmeta, nil
+	return &fmeta, nil
 }
