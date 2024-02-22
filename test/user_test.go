@@ -1,6 +1,7 @@
-package handler
+package main
 
 import (
+	"aria-cloud/handler"
 	"fmt"
 	"testing"
 )
@@ -18,11 +19,11 @@ func TestTri(t *testing.T) {
 		username string
 		token    string
 		ans      bool
-	}{username: "xhw", token: GenToken("xhw"), ans: true})
+	}{username: "xhw", token: handler.GenToken("xhw"), ans: true})
 
 	fmt.Println(test)
 	for index, tt := range test {
-		if isVaild := IsTokenVaild(tt.username, tt.token); isVaild != tt.ans {
+		if isVaild := handler.IsTokenVaild(tt.username, tt.token); isVaild != tt.ans {
 			t.Errorf("实例%d验证失败", index)
 		}
 	}

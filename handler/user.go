@@ -45,6 +45,27 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	sha1 := util.Sha1([]byte(passwd + pwd_salt))
 	suc := db.UserSignup(username, sha1)
+
+	// 创建用户专属文件夹
+	userFileDir := "./data/" + username
+	exists, err := util.PathExists(userFileDir)
+	if !exists {
+		err := os.MkdirAll(userFileDir, 0755)
+		if err != nil {
+			fmt.Println("创建文件夹时发生错误:", err)
+			return
+		}
+		fmt.Println("文件夹创建成功:", userFileDir)
+	} else {
+		if err != nil {
+			fmt.Println("创建用户专属文件夹失败!!!")
+			w.Write([]byte("创建用户专属文件夹失败"))
+			return
+		} else {
+			fmt.Println("已存在用户文件夹!!!")
+		}
+	}
+
 	if suc {
 		w.Write([]byte("SUCCESS"))
 	} else {
