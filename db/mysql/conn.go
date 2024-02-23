@@ -10,7 +10,7 @@ import (
 
 var db *sql.DB
 
-func init() {
+func initDB() {
 	var err error
 	db, err = sql.Open("mysql", "root:123456@tcp(127.0.0.1:3307)/aria?charset=utf8")
 	if err != nil {

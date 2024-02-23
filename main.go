@@ -1,25 +1,38 @@
 package main
 
 import (
+	"aria-cloud/Databases/mysql"
 	"aria-cloud/handler"
-	ini "aria-cloud/lib"
-	"fmt"
+	//ini "aria-cloud/lib"
+	//"fmt"
+	"log"
 	"net/http"
-	"strconv"
+	//"strconv"
+	"aria-cloud/Router"
 )
 
 func main() {
 	// 静态资源处理
 	// http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(assets.AssetFS())))
-	http.Handle("/static/",
-		http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 
-	router()
-	conf := ini.LoadServerConfig()
-	err := http.ListenAndServe(":"+strconv.Itoa(conf.HTTPPort), nil)
-	if err != nil {
-		fmt.Printf("Fail to start server, err:%v\n", err.Error())
+	//http.Handle("/static/",
+	//	http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
+
+	mysql.InitDB()
+	defer mysql.DB.Close()
+	r := Router.InitRouter()
+	r.LoadHTMLGlob("./static/view/*")
+	r.Static("/static", "./static")
+	if err := r.Run(":80"); err != nil {
+		log.Fatal("服务器启动失败...")
 	}
+
+	////router()
+	//conf := ini.LoadServerConfig()
+	//err := http.ListenAndServe(":"+strconv.Itoa(conf.HTTPPort), nil)
+	//if err != nil {
+	//	fmt.Printf("Fail to start server, err:%v\n", err.Error())
+	//}
 }
 
 func router() {
