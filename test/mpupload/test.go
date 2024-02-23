@@ -35,8 +35,9 @@ func main() {
 
 	var tf = file{}
 	tf.username = "xhw"
-	tf.token = "edb7387e5cb065101338961b4ff06de365d78908"
-	tf.from = "/Volumes/Akiiita/考研相关/1994-1999年数学二真题及其详解.pdf"
+	tf.token = "c090f2bbe7a12b9784ac61e24f705dce65d8997a"
+	//tf.from = "/Volumes/Akiiita/考研相关/李林最后4套卷【数二】【微信公众号：考研核心资料】免费分享.pdf"
+	tf.from = "/Volumes/Akiiita/考研相关/2021张剑黄皮书英语一提高版2009-2016试卷版01【W】【微信公众号：考研核心资料】免费分享.pdf"
 	tf.base = filepath.Base(tf.from)
 	//读取上传文件
 	upfile, err := os.Open(tf.from)
@@ -49,7 +50,7 @@ func main() {
 	fmt.Println("上传文件的hash：" + tf.hash)
 	tf.size = strconv.Itoa(int(util.GetFileSize(tf.from)))
 	fmt.Println("上传文件的大小：" + strconv.Itoa(int(util.GetFileSize(tf.from)/1024/1024)) + " M")
-	tf.to = conf.UploadLocation + tf.username + "/"
+	tf.to = conf.UploadLocation
 	fmt.Println("上传文件要放在：" + tf.to)
 
 	// 1. 请求初始化分块上传接口

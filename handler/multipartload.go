@@ -8,11 +8,11 @@ import (
 	"fmt"
 	redi "github.com/garyburd/redigo/redis"
 	"io"
-	"log"
 	"math"
 	"net/http"
 	"os"
 	"path"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -108,7 +108,7 @@ func CompleteUploadHandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	upid := r.Form.Get("uploadid")
 	username := r.Form.Get("username")
-	//filehash := r.Form.Get("filehash")
+	filehash := r.Form.Get("filehash")
 	//filesize := r.Form.Get("filesize")
 	filename := r.Form.Get("filename")
 
@@ -152,7 +152,7 @@ func CompleteUploadHandler(w http.ResponseWriter, r *http.Request) {
 
 	// 4.2 按顺序读取每一个分块
 	for i := 1; i <= totalCnt; i++ {
-		chunkFile, err := os.Open(fmt.Sprintf(conf.UploadLocation+username+"/%s/%d", upid, i))
+		chunkFile, err := os.Open(fmt.Sprintf(conf.UploadLocation+"%s/%d", upid, i))
 		if err != nil {
 			w.Write(util.NewRespMsg(-1, fmt.Sprintf("读取文件块 %d 时发生异常：%v", i, err.Error()), nil).JSONBytes())
 			return
@@ -165,15 +165,35 @@ func CompleteUploadHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+	// 4.4 合并完成后删除所有文件块及其文件夹
+	dirPath := fmt.Sprintf(conf.UploadLocation+"%s", upid) // 构建文件块所在文件夹的路径
+	err = os.RemoveAll(dirPath)                            // 删除文件夹及其所有内容
+	if err != nil {
+		// 如果删除过程中出现错误，记录或通知错误
+		w.Write(util.NewRespMsg(-1, fmt.Sprintf("删除文件块文件夹时发生异常：%v", err.Error()), nil).JSONBytes())
+		return
+	}
+
 	// 5 更新唯一文件表及用户文件表
 	info, err := outputFile.Stat()
 	if err != nil {
 		// 处理错误
-		log.Fatal(err)
+		fmt.Println(err.Error())
 		return
 	}
-	db.OnFileUploadFinished(util.FileSha1(outputFile), filename, info.Size(), filedir)
-	db.OnUserFileUploadFinished(username, util.FileSha1(outputFile), filename, info.Size())
+	db.OnFileUploadFinished(filehash, filepath.Base(filename), info.Size(), filedir)
+	db.OnUserFileUploadFinished(username, filehash, filepath.Base(filename), info.Size())
+
+	// 4.5 清空redis的缓存
+	_, err = redisConn.Do("DEL", "MP_"+upid)
+	if err != nil {
+		w.Write(util.NewRespMsg(-1, fmt.Sprintf("删除Redis缓存失败：%v", err.Error()), nil).JSONBytes())
+		return
+	}
+
 	// 6 响应处理结果
 	w.Write(util.NewRespMsg(0, "OK", nil).JSONBytes())
+}
+func DeleteUploadPartHandler() {
+
 }

@@ -39,7 +39,7 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 			FileSha1: "",
 			FileName: head.Filename,
 			FileSize: 0,
-			Location: conf.UploadLocation + username + "/" + head.Filename,
+			Location: conf.UploadLocation + head.Filename,
 			UploadAt: time.Now().Format("2006-06-06 15-04:05"),
 		}
 
