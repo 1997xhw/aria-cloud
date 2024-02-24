@@ -23,9 +23,11 @@
     //router
     "baseUrl": ".",
     "paths": {
+      "@": ["src"],
       "@/*": [
-        "src/*"
+        "./src/*"
       ],
+      "assets/*": ["src/assets/*"]
     }
   },
   "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue"],

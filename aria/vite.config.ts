@@ -6,15 +6,15 @@ import {ElementPlusResolver} from 'unplugin-vue-components/resolvers'
 // https://vitejs.dev/config/
 
 
-import {resolve} from 'path'
+import { resolve } from "path"
 
-const pathResolve = (dir: string): any => {
-    return resolve(__dirname, ".", dir)
-}
+// const pathResolve = (dir: string): any => {
+//     return resolve(__dirname, ".", dir)
+// }
 
-const alias: Record<string, string> = {
-    '@': pathResolve("src")
-}
+// const alias: Record<string, string> = {
+//     '@': pathResolve("src")
+// }
 export default defineConfig({
     plugins: [
         vue(),
@@ -26,6 +26,24 @@ export default defineConfig({
         }),
     ],
     resolve: {
-        alias
+        alias: {
+            "@": resolve(__dirname, "./src")
+        }
+    },
+    server: {
+        host: '0.0.0.0',
+        port: 3000,
+        proxy: {
+            '/dev-api': {
+                target: 'http://localhost:80',
+                changeOrigin: true,
+                rewrite: (p) => p.replace(/^\/dev-api/, '')
+            },
+            '/prod-api': {
+                target: 'http://localhost:80',
+                changeOrigin: true,
+                rewrite: (p) => p.replace(/^\/prod-api/, '')
+            },
+        }
     }
 })
