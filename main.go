@@ -3,6 +3,8 @@ package main
 import (
 	"aria-cloud/Databases/mysql"
 	"aria-cloud/handler"
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
 	//ini "aria-cloud/lib"
 	//"fmt"
 	"log"
@@ -21,6 +23,8 @@ func main() {
 	mysql.InitDB()
 	defer mysql.DB.Close()
 	r := Router.InitRouter()
+	router := gin.Default()
+	router.Use(cors.Default())
 	r.LoadHTMLGlob("./static/view/*")
 	r.Static("/static", "./static")
 	if err := r.Run(":80"); err != nil {

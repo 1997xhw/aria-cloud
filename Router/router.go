@@ -11,7 +11,7 @@ func InitRouter() *gin.Engine {
 
 	router.GET("/login", Controllers.Login)
 	router.GET("/siginup", Controllers.SiginUp)
-
+	router.POST("/login", Controllers.LoginHandler)
 	aria := router.Group("aria")
 	aria.Use(Middlewares.CheckLogin)
 	{
