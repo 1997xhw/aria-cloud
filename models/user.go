@@ -1,7 +1,7 @@
-package Models
+package models
 
 import (
-	"aria-cloud/Databases/mysql"
+	"aria-cloud/databases/mysql"
 	"errors"
 	"fmt"
 	"github.com/jinzhu/gorm"
@@ -15,14 +15,38 @@ type User struct {
 func (User) TableName() string {
 	return "tbl_user"
 }
+
+func AuthRegister(username, enpwd string) (bool, error) {
+	var user User
+	result := mysql.DB.Where("user_name=?", username).First(&user)
+	if result.Error == nil {
+		return false, errors.New("用户名已存在")
+	} else if result.Error != gorm.ErrRecordNotFound {
+		return false, result.Error
+	}
+
+	newUser := User{
+		UserName: username,
+		UserPwd:  enpwd,
+	}
+	saveResult := mysql.DB.Save(&newUser)
+	if saveResult.Error != nil {
+		// 保存新用户时出现错误
+		return false, saveResult.Error
+	}
+	// 注册成功
+	return true, nil
+}
+
 func AuthenticateUser(username, enpwd string) (bool, error) {
 	var user User
 	fmt.Println(username, enpwd)
 	result := mysql.DB.Where("user_name=?", username).First(&user)
 	if result.Error != nil {
 		if result.Error == gorm.ErrRecordNotFound {
+			var ErrUsernameNotFound = errors.New("用户不存在")
 			// 用户不存在
-			return false, result.Error
+			return false, ErrUsernameNotFound
 		}
 		// 数据库错误
 		return false, result.Error
@@ -31,7 +55,7 @@ func AuthenticateUser(username, enpwd string) (bool, error) {
 	// 检查密码是否匹配
 	if user.UserPwd != enpwd {
 		// 密码不匹配
-		var ErrPasswordMismatch = errors.New("password does not match")
+		var ErrPasswordMismatch = errors.New("密码错误请重试")
 		return false, ErrPasswordMismatch
 	}
 
