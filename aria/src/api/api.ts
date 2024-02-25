@@ -10,6 +10,17 @@ export function login(data :any) {
     })
 }
 
+export function register(data :any) {
+    return request({
+        headers: {
+            'Content-Type': 'application/json;charset=UTF-8',  //指定消息格式
+        },
+        url: '/register',
+        method: 'post',
+        data: data,
+    })
+}
+
 export default {
 
 }

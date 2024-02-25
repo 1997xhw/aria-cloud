@@ -4,6 +4,7 @@ import App from './App.vue'
 import router from "@/routes";
 import ScreenAdapter from "@/components/ScreenAdapter.vue";
 import "./style/tailwind.css";
+import "element-plus/dist/index.css";
 
 
 const app = createApp(App)

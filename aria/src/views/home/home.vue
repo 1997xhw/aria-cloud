@@ -1,12 +1,14 @@
 <script setup lang="ts">
 
-import Signin from "@/views/home/signin.vue";
+\\
+
+
 </script>
 
 <template>
   <div >
   <el-container class="main">
-    <signin></signin>
+
   </el-container>
   </div>
 </template>

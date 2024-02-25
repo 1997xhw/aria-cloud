@@ -1,57 +1,56 @@
 <script setup lang="ts">
 import {reactive, ref} from 'vue'
-import {login} from "@/api/api.ts";
+import {register} from "@/api/api.ts";
 import {ElNotification, FormRules} from "element-plus";
 import type {ElForm} from 'element-plus'
-import router from "@/routes";
 
-
+import { useRouter } from 'vue-router';
+const router = useRouter();
 type FormInstance = InstanceType<typeof ElForm>
 
-interface LoginForm {
+interface RegisterForm {
   username: string
   password: string
 }
 
-const loginFormRef = ref<FormInstance>()
-const loginForm = reactive<LoginForm>({
+const registerFormRef = ref<FormInstance>()
+const registerForm = reactive<RegisterForm>({
   username: "",
   password: ""
 
 })
-const rules = reactive<FormRules<LoginForm>>({
+const rules = reactive<FormRules<RegisterForm>>({
   username: [
     {required: true, message: 'Please input Activity name', trigger: 'blur'},
-    // { min: 3, max: 5, message: 'Length should be 3 to 5', trigger: 'blur' },
+    {min: 3, max: 5, message: 'Length should be 3 to 5', trigger: 'blur'},
   ],
   password: [
     {required: true, message: 'Please input Password', trigger: 'blur'},
+    {min: 5, max: 12, message: 'Length should be 3 to 12', trigger: 'blur'},
   ]
 })
 
-const RedirectSignup = () => {
- $router.push('/register')
-}
 
-const handleLogin = async (formEl: FormInstance) => {
-  if (!loginFormRef) return
-  await formEl.validate((vaild, fields) => {
+const handleRegister = async (formEl: FormInstance) => {
+  if (!registerFormRef) return
+  await formEl.validate((vaild) => {
     if (vaild) {
       const form: any = {
-        username: loginForm.username,
-        password: loginForm.password
+        username: registerForm.username,
+        password: registerForm.password
       }
       // 在这里添加登录逻辑
       // 例如，发送请求到后端验证用户名和密码
-      login(form).then(res => {
+      register(form).then(res => {
         if (res.code == 200) {
           ElNotification({
             title: 'Success',
-            message: '登陆成功！',
+            message: '注册成功！',
             type: 'success',
           })
 
           console.log(res)
+          router.push('/login')
         } else {
           ElNotification({
             title: 'Error',
@@ -61,9 +60,6 @@ const handleLogin = async (formEl: FormInstance) => {
           console.log(res.msg)
         }
       })
-    } else {
-      console.log(fields)
-      // return false
     }
   })
 
@@ -78,35 +74,33 @@ const handleLogin = async (formEl: FormInstance) => {
         <el-col :span="12">
           <img class="sigin-logo" src="@/assets/TEAMlogo.png">
         </el-col>
-        <el-col :span="12">
-          <el-button class="elsignup" type="text" style="font-size: 15px" @click="$router.push('/register')">No account?<br>Sign up</el-button>
-        </el-col>
       </el-row>
       <div class="font-bold mb-5 flex left-0">
-        <el-text style="font-size: 30px">登陆</el-text>
+        <el-text style="font-size: 30px">注册</el-text>
       </div>
       <el-form label-position="top"
                class="font-bold"
-               ref="loginFormRef"
+               ref="registerFormRef"
                :rules="rules"
                :hide-required-asterisk="true"
-               :model="loginForm"
+               :model="registerForm"
       >
         <el-form-item label="用户名" prop="username">
-          <el-input v-model="loginForm.username"></el-input>
+          <el-input v-model="registerForm.username"></el-input>
         </el-form-item>
         <el-form-item label="密码" class="mt-5" prop="password">
-          <el-input v-model="loginForm.password"></el-input>
-
+          <el-input v-model="registerForm.password"></el-input>
         </el-form-item>
-        <div class="">
-          <div class="text-right">
-            <el-button type="text" style="font-size: 12px;">Forget Password?</el-button>
-          </div>
-          <div class="text-left mb-5">
-            <el-button type="primary" @click="handleLogin(loginFormRef)">登陆</el-button>
-          </div>
+
+        <div class="text-right">
+          <el-button type="text" style="font-size: 12px;" @click="$router.push('/login')">已有账号?</el-button>
         </div>
+          <div  class=" text-left mb-5">
+            <el-button type="primary" @click="handleRegister(registerFormRef)">注册</el-button>
+          </div>
+
+
+
       </el-form>
     </el-card>
   </el-container>
