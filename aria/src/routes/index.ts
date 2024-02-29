@@ -33,8 +33,6 @@ router.beforeEach(async (to, from, next) => {
     // 3.判断是否有 Token，没有重定向到 login 页面
     if (!userStore.token) return next({ path: "/login", replace: true });
 
-
-
     next();
 
 })

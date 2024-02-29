@@ -25,6 +25,11 @@ type User struct {
 	Password string `json:"password"`
 }
 
+type ReturnData struct {
+	Username string `json:"username"`
+	Token    string `json:"token"`
+}
+
 func RegiesterHandler(c *gin.Context) {
 	var user = User{}
 	if err := c.ShouldBindJSON(&user); err != nil {
@@ -87,9 +92,12 @@ func LoginHandler(c *gin.Context) {
 		fmt.Println(token)
 		_ = services.UpadteUserToken(username, token)
 		c.JSON(http.StatusOK, gin.H{
-			"code":  http.StatusOK,
-			"msg":   "登陆成功",
-			"token": token,
+			"code": http.StatusOK,
+			"msg":  "登陆成功",
+			"data": ReturnData{
+				Username: username,
+				Token:    token,
+			},
 		})
 	} else {
 		c.JSON(http.StatusOK, gin.H{
