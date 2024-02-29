@@ -10,6 +10,9 @@ export function login(data :any) {
     })
 }
 
+
+
+
 export function register(data :any) {
     return request({
         headers: {
