@@ -11,8 +11,7 @@
         "isLink": "",
         "isHide": false,
         "isFull": false,
-        "isAffix": true,
-        "isKeepAlive": true
+        "isAffix": true
       }
     },
     {
@@ -20,13 +19,105 @@
       "name": "info",
       "component": "/home/info",
       "meta": {
-        "icon": "UserFilled",
+        "icon": "User",
         "title": "详情",
         "isLink": "",
         "isHide": false,
         "isFull": false,
-        "isAffix": true,
-        "isKeepAlive": true
+        "isAffix": true
+      }
+    },
+    {
+      "path": "/file",
+      "name": "file",
+      "component": "/file",
+      "meta": {
+        "icon": "MostlyCloudy",
+        "title": "文件",
+        "isLink": "",
+        "isHide": false,
+        "isFull": false,
+        "isAffix": true
+      },
+      "children": [
+        {
+          "path": "/file/MyDoc",
+          "name": "file-document",
+          "component": "/file/MyDoc",
+          "meta": {
+            "icon": "Document",
+            "title": "我的文档",
+            "isLink": "",
+            "isHide": false,
+            "isFull": false,
+            "isAffix": true
+          }
+        },
+        {
+          "path": "/file/MyPic",
+          "name": "file-picture",
+          "component": "/file/MyPic",
+          "meta": {
+            "icon": "Picture",
+            "title": "我的图片",
+            "isLink": "",
+            "isHide": false,
+            "isFull": false,
+            "isAffix": true
+          }
+        },
+        {
+          "path": "/file/MyVid",
+          "name": "file-video",
+          "component": "/file/MyVid",
+          "meta": {
+            "icon": "VideoCamera",
+            "title": "我的视频",
+            "isLink": "",
+            "isHide": false,
+            "isFull": false,
+            "isAffix": true
+          }
+        },
+        {
+          "path": "/file/MyMic",
+          "name": "file-music",
+          "component": "/file/MyMic",
+          "meta": {
+            "icon": "VideoCamera",
+            "title": "我的音乐",
+            "isLink": "",
+            "isHide": false,
+            "isFull": false,
+            "isAffix": true
+          }
+        },
+        {
+          "path": "/file/MyOther",
+          "name": "file-other",
+          "component": "/file/MyOther",
+          "meta": {
+            "icon": "More",
+            "title": "其他",
+            "isLink": "",
+            "isHide": false,
+            "isFull": false,
+            "isAffix": true
+          }
+        }
+      ]
+    },
+    {
+      "path": "/file/upload",
+      "name": "upload",
+      "component": "/file/upload/index",
+      "meta": {
+        "icon": "UploadFilled",
+        "title": "上传",
+        "isLink": "",
+        "isHide": false,
+        "isFull": false,
+        "isAffix": true
       }
     }
   ],

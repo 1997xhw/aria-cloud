@@ -1,0 +1,26 @@
+.upload{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+
+  :deep(.u-head) {
+    display: flex;
+    align-items: center;
+    height: 100px;
+    color: #303133;
+    font-size: 18px;
+  }
+  :deep(.u-main) {
+    position: relative;
+    display: flex;
+    height: 520px;
+    align-items: start;
+  }
+  //.home-bg {
+  //  width: 70%;
+  //  max-width: 1200px;
+  //  margin-bottom: 20px;
+  //}
+}
