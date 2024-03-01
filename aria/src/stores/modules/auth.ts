@@ -1,5 +1,7 @@
 import {defineStore} from "pinia";
 import {getAllBreadcrumbList, getFlatMenuList, getShowMenuList} from "@/utils";
+import {getAuthButtonListApi, getAuthMenuListApi} from "@/api/api.ts";
+import {AuthState} from "@/stores/interface";
 
 export const useAuthStore = defineStore({
     id : "aria-auth",
@@ -21,7 +23,7 @@ export const useAuthStore = defineStore({
         // 菜单权限列表 ==> 扁平化之后的一维数组菜单，主要用来添加动态路由
         flatMenuListGet: state => getFlatMenuList(state.authMenuList),
         // 递归处理后的所有面包屑导航列表
-        breadcrumbListGet: state => getAllBßreadcrumbList(state.authMenuList)
+        breadcrumbListGet: state => getAllBreadcrumbList(state.authMenuList)
     },
     actions: {
         // Get AuthButtonList

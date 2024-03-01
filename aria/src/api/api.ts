@@ -1,4 +1,7 @@
 import request from "@/utils/request.ts"
+import authMenuList from '@/assets/json/authMenuList.json';
+import authButtonList from '@/assets/json/authButtonList.json';
+
 export function login(data :any) {
     return request({
         headers: {
@@ -11,6 +14,15 @@ export function login(data :any) {
 }
 
 
+export const getAuthMenuListApi = () => {
+    // return GET<MenuOptions[]>(PORT1 + `/menu/list`, {}, { loading: false });
+    // 如果想让菜单变为本地数据，注释上一行代码，并引入本地 authMenuList.json 数据
+    return authMenuList;
+};
+
+export const getAuthButtonListApi = () => {
+    return authButtonList;
+};
 
 
 export function register(data :any) {
@@ -23,6 +35,10 @@ export function register(data :any) {
         data: data,
     })
 }
+export const logoutApi = () => {
+    // return http.post(PORT1 + `/logout`);
+    return
+};
 
 export default {
 

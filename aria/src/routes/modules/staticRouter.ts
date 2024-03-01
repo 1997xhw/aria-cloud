@@ -1,4 +1,5 @@
 import { RouteRecordRaw } from "vue-router";
+import {HOME_URL} from "@/config";
 
 export const staticRouter: RouteRecordRaw[] = [
     {
@@ -18,6 +19,14 @@ export const staticRouter: RouteRecordRaw[] = [
         path: '/register',
         name: 'register',
         component: () => import('@/views/login/signup.vue')
+    },
+    {
+        path: "/layout",
+        name: "layout",
+        component: () => import("@/layouts/index.vue"),
+        // component: () => import("@/layouts/indexAsync.vue"),
+        redirect: HOME_URL,
+        children: []
     }
 ]
 

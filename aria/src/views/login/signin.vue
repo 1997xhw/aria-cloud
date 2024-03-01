@@ -3,8 +3,9 @@ import {reactive, ref} from 'vue'
 import {login} from "@/api/api.ts";
 import {ElNotification} from "element-plus";
 import type {ElForm} from 'element-plus'
-import {useUserStore} from "@/store/modules/user.ts";
+import {useUserStore} from "@/stores/modules/user.ts";
 import router from "@/routes";
+import {HOME_URL} from "@/config";
 
 
 const userStore = useUserStore();
@@ -45,7 +46,7 @@ const handleLogin = async (formEl: FormInstance | undefined) => {
       }
       // 在这里添加登录逻辑
       // 例如，发送请求到后端验证用户名和密码
-      try{
+      try {
         login(form).then(res => {
           if (res.code == 200) {
             userStore.setToken(res.data.token);
@@ -56,7 +57,7 @@ const handleLogin = async (formEl: FormInstance | undefined) => {
               type: 'success',
             })
             console.log(res)
-            router.push("/home")
+            router.push(HOME_URL)
           } else {
             ElNotification({
               title: 'Error',
@@ -74,8 +75,6 @@ const handleLogin = async (formEl: FormInstance | undefined) => {
       return
     }
   })
-
-
 }
 </script>
 
@@ -120,17 +119,9 @@ const handleLogin = async (formEl: FormInstance | undefined) => {
     </div>
   </el-container>
 </template>
-//position: relative;
-//left: 8%;
-//top: 12%;
-//padding: 10px 10px 20px 10px;
-
-//border-radius: 30px; /* 设置圆角大小 */
-//background-color: rgba(255, 255, 255, 0.7); /* 设置背景透明 */
-//border-color: rgba(255, 255, 255, 0);
 <style scoped>
 
 
-@import "./index.css";
+@import "index.scss";
 
 </style>

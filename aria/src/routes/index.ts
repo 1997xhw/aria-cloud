@@ -1,8 +1,9 @@
 import {createRouter, createWebHistory, createWebHashHistory} from "vue-router";
-import { staticRouter, errorRouter } from "@/routes/modules/staticRouter";
+import {staticRouter, errorRouter} from "@/routes/modules/staticRouter";
 import NProgress from "@/config/nprogress";
-import {useUserStore} from "@/store/modules/user.ts";
-import {useAuthStore} from "@/store/modules/auth.ts";
+import {useUserStore} from "@/stores/modules/user.ts";
+import {useAuthStore} from "@/stores/modules/auth.ts";
+import {initDynamicRouter} from "@/routes/modules/dynamicRouter.ts";
 
 
 const mode = "hash";
@@ -20,7 +21,7 @@ const router = createRouter({
 
 router.beforeEach(async (to, from, next) => {
     const userStore = useUserStore();
-
+    const authStore = useAuthStore();
     // 1.NProgress 开始
     NProgress.start();
 
@@ -31,7 +32,13 @@ router.beforeEach(async (to, from, next) => {
         return next();
     }
     // 3.判断是否有 Token，没有重定向到 login 页面
-    if (!userStore.token) return next({ path: "/login", replace: true });
+    if (!userStore.token) return next({path: "/login", replace: true});
+
+    // 6.如果没有菜单列表，就重新请求菜单列表并添加动态路由
+    if (!authStore.authMenuListGet.length) {
+        await initDynamicRouter();
+        return next({...to, replace: true});
+    }
 
     next();
 
@@ -44,7 +51,7 @@ router.beforeEach(async (to, from, next) => {
 export const resetRouter = () => {
     const authStore = useAuthStore();
     authStore.flatMenuListGet.forEach(route => {
-        const { name } = route;
+        const {name} = route;
         if (name && router.hasRoute(name)) router.removeRoute(name);
     });
 };

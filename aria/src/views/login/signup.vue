@@ -107,5 +107,5 @@ const handleRegister = async (formEl: FormInstance) => {
 </template>
 
 <style scoped>
-@import "./index.css";
+@import "index.scss";
 </style>
