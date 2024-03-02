@@ -3,9 +3,10 @@ import {HOME_URL} from "@/config";
 
 export const staticRouter: RouteRecordRaw[] = [
     {
-        path: "/home",
-        name: 'home',
-        component: () => import('@/views/home/index.vue')
+        path: "/",
+        redirect: HOME_URL
+        // name: 'home',
+        // component: () => import('@/views/home/index.vue')
     },
     {
         path: '/login',

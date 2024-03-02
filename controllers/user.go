@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"aria-cloud/old-aria/db"
 	"aria-cloud/services"
 	"aria-cloud/util"
 	"fmt"
@@ -155,9 +154,15 @@ func IsTokenVaild(username string, token string) bool {
 	}
 
 	// 2. 从数据表tbl_user_token查询username对应的token信息
-	dbToken, _ := db.GetTokenByUsername(username)
+	dbToken, err := services.GetTokenByUsername(username)
+	if err != nil {
+		return false
+	}
+	//fmt.Println("dbtoken: ", dbToken)
+	//fmt.Println("token: ", token)
 	// 3. 对比两个token是否一致
 	if dbToken != token {
+
 		fmt.Println("token不一致！！！")
 		return false
 	}

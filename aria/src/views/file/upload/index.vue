@@ -2,6 +2,8 @@
 import {ref} from 'vue'
 import {genFileId, UploadUserFile, ElMessageBox} from 'element-plus'
 import type {UploadInstance, UploadProps, UploadRawFile} from 'element-plus'
+import {useUserStore} from "@/stores/modules/user.ts";
+import {uploadFile} from "@/api/api.ts";
 
 const upload = ref<UploadInstance>()
 
@@ -12,18 +14,28 @@ const handleExceed: UploadProps['onExceed'] = (files) => {
   file.uid = genFileId()
   upload.value!.handleStart(file)
 }
-
+const userStore = useUserStore();
 const submitUpload = () => {
-  upload.value!.submit()
+  // upload.value!.submit()
+  formData.append("username", userStore.username)
+  formData.append("token", userStore.token)
+  uploadFile(formData).then(res => {
+    if (res.code == 200) {
+      console.log(res.msg)
+      console.log(res)
+    } else {
+      console.log(res.msg)
+    }
+  })
 }
 const handleRemove: UploadProps['onRemove'] = (file, uploadFiles) => {
   console.log(file, uploadFiles)
 }
 
-const handlePreview: UploadProps['onPreview'] = (uploadFile) => {
-  console.log(uploadFile)
-}
-const beforeRemove: UploadProps['beforeRemove'] = (uploadFile, uploadFiles) => {
+// const handlePreview: UploadProps['onPreview'] = (uploadFile) => {
+//   console.log(uploadFile.name)
+// }
+const beforeRemove: UploadProps['beforeRemove'] = (uploadFile) => {
   return ElMessageBox.confirm(
       `Cancel the transfer of ${uploadFile.name} ?`
   ).then(
@@ -31,12 +43,49 @@ const beforeRemove: UploadProps['beforeRemove'] = (uploadFile, uploadFiles) => {
       () => false
   )
 }
+// const handleChange = (resp:any, file, fileList) => {
+//   if (resp.code === 200) {
+//     // 上传成功
+//     console.log("success")
+//   } else {
+//     // 上传失败
+//     console.log(resp.msg)
+//     // 清除上传列表中的该文件
+//     fileList.splice(fileList.indexOf(file), 1)
+//   }
+//
+//
+// }
+
+let formData = new FormData()
+const handleChange = (file, fileList) => {
+  console.log(file)
+  formData.append("file", file.raw)
+  if (file.status !== 'uploading') {
+    console.log(file, fileList)
+    if (file.status == 'done') {
+      console.log(file.response.msg)
+      // formState.filePath = file.response.data
+      return
+    }
+    // if (file.status == 'removed') {
+    //   removeFile({data: filePath.value}).then(res => {
+    //     if (res.code == 200) {
+    //       message.success(res.msg)
+    //     } else {
+    //       message.error(res.msg)
+    //     }
+    //   })
+    //   return
+    // }
+  }
+};
 
 </script>
 
 <template>
   <div class="upload">
-    <el-container class="w-full" >
+    <el-container class="w-full">
       <el-header class="card u-head">
         <div class="ml-5 ">
           <el-icon class="top-0.5">
@@ -46,32 +95,28 @@ const beforeRemove: UploadProps['beforeRemove'] = (uploadFile, uploadFiles) => {
         </div>
       </el-header>
       <el-main class="mt-5 card u-main w-full">
-        <div class=" relative  w-full ">
-          <el-upload
-              v-model:file-list="fileList"
-              class="upload-demo w-full"
-              action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
-              multiple
-              :on-preview="handlePreview"
-              :on-remove="handleRemove"
-              :before-remove="beforeRemove"
-              :limit="3"
-              :on-exceed="handleExceed"
-              :auto-upload="false"
-          >
+        <el-upload
+            ref="upload"
+            v-model:file-list="fileList"
+            action="#"
 
-              <template #trigger>
-                <el-button>选择文件</el-button>
-              </template>
+            :on-change="handleChange"
+            :on-remove="handleRemove"
+            :before-remove="beforeRemove"
+            :max-count="1"
+            :limit="1"
+            :on-exceed="handleExceed"
+            :auto-upload="false"
+        >
 
-              <el-button class="ml-3" type="success" @click="submitUpload">上传文件</el-button>
-              <el-button type="danger">删除文件</el-button>
-              <el-button type="warning">终止上传</el-button>
+          <template #trigger>
+            <el-button>选择文件</el-button>
+          </template>
 
-
-          </el-upload>
-
-        </div>
+          <el-button class="ml-3" type="success" @click="submitUpload">上传文件</el-button>
+          <el-button type="danger">删除文件</el-button>
+          <el-button type="warning">终止上传</el-button>
+        </el-upload>
 
       </el-main>
     </el-container>

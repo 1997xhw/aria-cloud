@@ -12,11 +12,12 @@ func InitRouter() *gin.Engine {
 	router.GET("/login", controllers.Login)
 	router.POST("/register", controllers.RegiesterHandler)
 	router.POST("/login", controllers.LoginHandler)
-
-	aria := router.Group("aria")
+	//router.POST("/file/upload", controllers.UploadFile)
+	aria := router.Group("/aria")
 	aria.Use(middlewares.CheckLogin)
 	{
 		aria.GET("/home", controllers.UserHome)
+		aria.POST("/file/upload", controllers.UploadFile)
 	}
 
 	return router

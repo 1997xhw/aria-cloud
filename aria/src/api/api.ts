@@ -12,6 +12,18 @@ export function login(data :any) {
         data: data,
     })
 }
+export function uploadFile(data :FormData) {
+    return request({
+        url: '/aria/file/upload',
+        method: 'post',
+        data: data,
+        transformRequest:[function (data, headers) {
+            delete headers[ 'Content-Type']
+            return data
+        }
+        ]
+    })
+}
 
 
 export const getAuthMenuListApi = () => {

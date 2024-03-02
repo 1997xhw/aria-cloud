@@ -84,3 +84,19 @@ func UpdateUserToken(username, token string) bool {
 
 	return true
 }
+
+func GetTokenByUsername(username string) (string, error) {
+	var user UserToken
+	result := mysql.DB.Where("user_name=?", username).First(&user)
+	if result.Error != nil {
+		if result.Error == gorm.ErrRecordNotFound {
+			var ErrUsernameNotFound = errors.New("用户不存在")
+			// 用户不存在
+			return "", ErrUsernameNotFound
+		}
+		// 数据库错误
+		return "", result.Error
+	}
+	return user.UserToken, nil
+
+}

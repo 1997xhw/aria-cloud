@@ -4,6 +4,7 @@ import (
 	ini "aria-cloud/lib"
 	"fmt"
 	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"log"
 )
 

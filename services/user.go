@@ -32,3 +32,7 @@ func Register(username, password string) (bool, error) {
 func UpadteUserToken(username, token string) bool {
 	return models.UpdateUserToken(username, token)
 }
+
+func GetTokenByUsername(username string) (string, error) {
+	return models.GetTokenByUsername(username)
+}

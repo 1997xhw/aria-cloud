@@ -8,20 +8,31 @@ import (
 )
 
 func CheckLogin(c *gin.Context) {
-	//token, err := c.Cookie("Token")
-	username := c.Query("username")
+
+	var username, token string
+	if c.Request.Method == "GET" {
+		username = c.Query("username")
+		token = c.Query("token")
+	} else if c.Request.Method == "POST" {
+		username = c.PostForm("username")
+		token = c.PostForm("token")
+	}
+
 	if username == "" {
 		fmt.Println("need username")
 		c.Redirect(http.StatusFound, "/login")
 		c.Abort()
+		return
 	}
 
-	token := c.Query("token")
 	if token == "" {
 		fmt.Println("need token")
 		c.Redirect(http.StatusFound, "/login")
 		c.Abort()
+		return
 	}
+	//fmt.Println(username)
+	//fmt.Println(token)
 	if len(username) < 3 || !controllers.IsTokenVaild(username, token) {
 		c.Redirect(http.StatusFound, "/login")
 		c.Abort()
