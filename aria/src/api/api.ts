@@ -25,6 +25,23 @@ export function uploadFile(data :FormData) {
     })
 }
 
+export const uloadFile = (data :any,onUploadProgress:any) => {
+    return request({
+        url: '/aria/file/upload',
+        method: 'post',
+        data,
+        onUploadProgress: onUploadProgress
+    })
+}
+export const verifyToken = (token :string, username :string)=> {
+    return request({
+        url: '/verify?token='+token+'&username=' + username,
+        method: 'get',
+    })
+}
+
+
+
 
 export const getAuthMenuListApi = () => {
     // return GET<MenuOptions[]>(PORT1 + `/menu/list`, {}, { loading: false });

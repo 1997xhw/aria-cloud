@@ -4,6 +4,9 @@ import NProgress from "@/config/nprogress";
 import {useUserStore} from "@/stores/modules/user.ts";
 import {useAuthStore} from "@/stores/modules/auth.ts";
 import {initDynamicRouter} from "@/routes/modules/dynamicRouter.ts";
+import {verifyToken} from "@/api/api.ts";
+import {ElNotification} from "element-plus";
+import {LOGIN_URL} from "@/config";
 
 
 const mode = "hash";
@@ -33,6 +36,19 @@ router.beforeEach(async (to, from, next) => {
     }
     // 3.判断是否有 Token，没有重定向到 login 页面
     if (!userStore.token) return next({path: "/login", replace: true});
+
+    // 4.验证token
+    verifyToken(userStore.token, userStore.username).then(res=> {
+        console.log(res)
+        if (res.code!=200) {
+            ElNotification({
+                title: 'token异常',
+                message: res.msg,
+                type: 'error',
+            })
+            router.replace(LOGIN_URL);
+        }
+    })
 
     // 6.如果没有菜单列表，就重新请求菜单列表并添加动态路由
     if (!authStore.authMenuListGet.length) {

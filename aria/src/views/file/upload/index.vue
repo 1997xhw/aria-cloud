@@ -3,7 +3,7 @@ import {ref} from 'vue'
 import {genFileId, UploadUserFile, ElMessageBox} from 'element-plus'
 import type {UploadInstance, UploadProps, UploadRawFile} from 'element-plus'
 import {useUserStore} from "@/stores/modules/user.ts";
-import {uploadFile} from "@/api/api.ts";
+import {uloadFile, uploadFile} from "@/api/api.ts";
 
 const upload = ref<UploadInstance>()
 
@@ -28,6 +28,26 @@ const submitUpload = () => {
     }
   })
 }
+
+const progressShu = ref(0) //控制进度条
+const ulpadFile = async (file:any) => {
+
+  var fd = new FormData();
+  fd.append("file", file.file)
+  fd.append("username", userStore.username)
+  fd.append("token", userStore.token)
+
+  const {data} = await uloadFile(fd, (e) => {
+    // isShow.value = true;
+    //计算进度条的值e.loaded当前进度 ,e.total总进度
+    progressShu.value = Number((e.loaded / e.total * 100).toFixed(0))
+
+  })
+
+  // isShow.value = false;
+
+}
+
 const handleRemove: UploadProps['onRemove'] = (file, uploadFiles) => {
   console.log(file, uploadFiles)
 }
@@ -98,8 +118,8 @@ const handleChange = (file, fileList) => {
         <el-upload
             ref="upload"
             v-model:file-list="fileList"
-            action="#"
-
+            action=""
+            :http-request="ulpadFile"
             :on-change="handleChange"
             :on-remove="handleRemove"
             :before-remove="beforeRemove"
@@ -113,7 +133,7 @@ const handleChange = (file, fileList) => {
             <el-button>选择文件</el-button>
           </template>
 
-          <el-button class="ml-3" type="success" @click="submitUpload">上传文件</el-button>
+          <el-button class="ml-3" type="success" @click="ulpadFile">上传文件</el-button>
           <el-button type="danger">删除文件</el-button>
           <el-button type="warning">终止上传</el-button>
         </el-upload>

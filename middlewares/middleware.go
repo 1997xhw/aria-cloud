@@ -1,7 +1,7 @@
 package middlewares
 
 import (
-	"aria-cloud/controllers"
+	"aria-cloud/services"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -33,7 +33,8 @@ func CheckLogin(c *gin.Context) {
 	}
 	//fmt.Println(username)
 	//fmt.Println(token)
-	if len(username) < 3 || !controllers.IsTokenVaild(username, token) {
+	err := services.IsTokenVaild(username, token)
+	if len(username) < 3 && err != nil {
 		c.Redirect(http.StatusFound, "/login")
 		c.Abort()
 	}

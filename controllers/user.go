@@ -7,12 +7,28 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/goccy/go-json"
 	"net/http"
-	"strconv"
 	"time"
 )
 
 func Login(c *gin.Context) {
 	c.HTML(http.StatusOK, "signin.html", nil)
+}
+func Verify(c *gin.Context) {
+	username := c.Query("username")
+	token := c.Query("token")
+	fmt.Println(username, token)
+	err := services.IsTokenVaild(username, token)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"msg":  err.Error(),
+			"code": http.StatusInternalServerError,
+		})
+	} else {
+		c.JSON(http.StatusOK, gin.H{
+			"msg":  "ok",
+			"code": http.StatusOK,
+		})
+	}
 }
 
 func SiginUp(c *gin.Context) {
@@ -35,8 +51,8 @@ func RegiesterHandler(c *gin.Context) {
 		//绑定失败
 		fmt.Println("数据绑定失败：", err.Error())
 		c.JSON(http.StatusOK, gin.H{
-			"message": "参数格式不正确",
-			"status":  500,
+			"msg":    "参数格式不正确",
+			"status": 500,
 		})
 	} else {
 		res, err := services.Register(user.Username, user.Password)
@@ -62,8 +78,8 @@ func LoginHandler(c *gin.Context) {
 	if err != nil {
 		fmt.Println("数据解析失败：", err.Error())
 		c.JSON(http.StatusOK, gin.H{
-			"message": "参数格式不正确",
-			"status":  500,
+			"msg":    "参数格式不正确",
+			"status": 500,
 		})
 	}
 	fmt.Println(m["username"])
@@ -130,42 +146,4 @@ func GenToken(username string) string {
 	timestamp := fmt.Sprintf("%x", time.Now().Unix())
 	tokenPrefix := util.MD5([]byte(username + timestamp + "_tokonsalt"))
 	return tokenPrefix + timestamp[:8]
-}
-
-// IsTokenVaild 验证token
-func IsTokenVaild(username string, token string) bool {
-	if len(token) != 40 {
-		fmt.Println("token is wrong!")
-		return false
-	}
-	// 1. 判断token时效性
-	hexTimestamp := token[len(token)-8:]
-	timestamp, err := strconv.ParseInt(hexTimestamp, 16, 64)
-	if err != nil {
-		fmt.Println("Error converting hex to int:", err)
-		return false
-	}
-	// 将Unix时间戳转换为time.Time
-	tokenTime := time.Unix(timestamp, 0)
-	// 检查token时间是否超过1小时
-	if time.Since(tokenTime).Hours() > 2 {
-		fmt.Printf("token已过期！！")
-		return false
-	}
-
-	// 2. 从数据表tbl_user_token查询username对应的token信息
-	dbToken, err := services.GetTokenByUsername(username)
-	if err != nil {
-		return false
-	}
-	//fmt.Println("dbtoken: ", dbToken)
-	//fmt.Println("token: ", token)
-	// 3. 对比两个token是否一致
-	if dbToken != token {
-
-		fmt.Println("token不一致！！！")
-		return false
-	}
-
-	return true
 }

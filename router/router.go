@@ -10,6 +10,8 @@ func InitRouter() *gin.Engine {
 	router := gin.Default()
 
 	router.GET("/login", controllers.Login)
+	router.GET("/verify", controllers.Verify)
+
 	router.POST("/register", controllers.RegiesterHandler)
 	router.POST("/login", controllers.LoginHandler)
 	//router.POST("/file/upload", controllers.UploadFile)

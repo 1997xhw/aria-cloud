@@ -12,9 +12,9 @@ const authStore = useAuthStore();
 const globalStore = useGlobalStore();
 const accordion = computed(() => globalStore.accordion);
 const isCollapse = computed(() => globalStore.isCollapse);
-console.log(isCollapse)
+// console.log(isCollapse)
 const menuList = computed(() => authStore.showMenuListGet);
-console.log(menuList)
+// console.log(menuList)
 const activeMenu = computed(() => (route.meta.activeMenu ? route.meta.activeMenu : route.path) as string);
 </script>
 
