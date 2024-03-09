@@ -4,6 +4,7 @@ import (
 	"aria-cloud/services"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"log"
 	"net/http"
 )
 
@@ -26,7 +27,7 @@ func CheckLogin(c *gin.Context) {
 	}
 
 	if token == "" {
-		fmt.Println("need token")
+		log.Println("need token")
 		c.Redirect(http.StatusFound, "/login")
 		c.Abort()
 		return

@@ -20,6 +20,7 @@ func InitRouter() *gin.Engine {
 	{
 		aria.GET("/home", controllers.UserHome)
 		aria.POST("/file/upload", controllers.UploadFile)
+		aria.GET("/file/allList", controllers.AllFileList)
 	}
 
 	return router

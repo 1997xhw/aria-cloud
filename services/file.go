@@ -13,6 +13,14 @@ import (
 	"time"
 )
 
+func GetAllFileList(username string) ([]models.TableUserFile, error) {
+	fileList, err := models.GetAllFileList(username)
+	if err != nil {
+		log.Println(err.Error())
+		return nil, err
+	}
+	return fileList, nil
+}
 func SaveFileHandler(file *multipart.FileHeader, username string) error {
 	conf := ini.LoadServerConfig()
 	fileMeta := common.FileMeta{

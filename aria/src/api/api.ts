@@ -40,7 +40,12 @@ export const verifyToken = (token :string, username :string)=> {
     })
 }
 
-
+export const getFileAllList=(token :string, username :string)=> {
+    return request({
+        url:'/aria/file/allList?token='+token+'&username=' + username,
+        method:'get'
+    })
+}
 
 
 export const getAuthMenuListApi = () => {
@@ -64,6 +69,7 @@ export function register(data :any) {
         data: data,
     })
 }
+
 export const logoutApi = () => {
     // return http.post(PORT1 + `/logout`);
     return

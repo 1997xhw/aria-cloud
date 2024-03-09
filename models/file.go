@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/jinzhu/gorm"
+	"time"
 )
 
 type TableFile struct {
@@ -20,10 +21,11 @@ func (TableFile) TableName() string {
 }
 
 type TableUserFile struct {
-	Username string `gorm:"column:user_name;"`
-	FileSha1 string `gorm:"column:file_sha1;"`
-	FileName string `gorm:"column:file_name;"`
-	FileSize int64  `gorm:"column:file_size;"`
+	Username   string    `gorm:"column:user_name;" json:"user_name"`
+	FileSha1   string    `gorm:"column:file_sha1;" json:"file_sha"`
+	FileName   string    `gorm:"column:file_name;" json:"file_name"`
+	FileSize   int64     `gorm:"column:file_size;" json:"file_size"`
+	LastUpdate time.Time `gorm:"column:last_update" json:"last_update"`
 }
 
 func (TableUserFile) TableName() string {
@@ -71,4 +73,14 @@ func OnUserFileUploadFinished(fmeta common.FileMeta, username string) error {
 	}
 	return nil
 
+}
+
+func GetAllFileList(username string) ([]TableUserFile, error) {
+	var fileList []TableUserFile
+	find := mysql.DB.Where("user_name=?", username).Find(&fileList)
+	if find.Error != nil {
+		fmt.Println(find.Error)
+		return nil, find.Error
+	}
+	return fileList, nil
 }

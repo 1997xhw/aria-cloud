@@ -8,6 +8,22 @@ import (
 	"net/http"
 )
 
+func AllFileList(c *gin.Context) {
+	username := c.Query("username")
+	fileList, err := services.GetAllFileList(username)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"code": http.StatusInternalServerError,
+			"msg":  err.Error(),
+		})
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"code": http.StatusOK,
+		"msg":  "ok",
+		"data": fileList,
+	})
+
+}
 func UploadFile(c *gin.Context) {
 	file, err := c.FormFile("file")
 	if err != nil {

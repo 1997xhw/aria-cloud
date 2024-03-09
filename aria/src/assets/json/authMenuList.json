@@ -41,6 +41,19 @@
       },
       "children": [
         {
+          "path": "/file/AllFile",
+          "name": "file-all",
+          "component": "/file/AllFile/index",
+          "meta": {
+            "icon": "Document",
+            "title": "全部文件",
+            "isLink": "",
+            "isHide": false,
+            "isFull": false,
+            "isAffix": true
+          }
+        },
+        {
           "path": "/file/MyDoc",
           "name": "file-document",
           "component": "/file/MyDoc",
