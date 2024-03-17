@@ -43,14 +43,14 @@ const handleRegister = async (formEl: FormInstance) => {
       // 在这里添加登录逻辑
       // 例如，发送请求到后端验证用户名和密码
       register(form).then(res => {
-        if (res.code == 200) {
+        if (res.status == 200) {
           ElNotification({
             title: 'Success',
             message: '注册成功！',
             type: 'success',
           })
 
-          console.log(res)
+          // console.log(res)
           router.push('/login')
         } else {
           ElNotification({
@@ -58,7 +58,7 @@ const handleRegister = async (formEl: FormInstance) => {
             message: res.msg,
             type: 'error',
           })
-          console.log(res.msg)
+          // console.log(res.msg)
         }
       })
     }

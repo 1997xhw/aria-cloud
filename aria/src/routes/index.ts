@@ -38,17 +38,31 @@ router.beforeEach(async (to, from, next) => {
     if (!userStore.token) return next({path: "/login", replace: true});
 
     // 4.验证token
-    verifyToken(userStore.token, userStore.username).then(res=> {
-        console.log(res)
-        if (res.code!=200) {
+    try {
+        const res = await verifyToken(userStore.token, userStore.username);
+        console.log(res);
+        if (res.status != 200) {
             ElNotification({
-                title: 'token异常',
+                title: 'Token 异常',
                 message: res.msg,
                 type: 'error',
-            })
-            router.replace(LOGIN_URL);
+            });
+            userStore.$reset();
+            return next({ path: LOGIN_URL, replace: true });
+        } else {
+            console.log("验证通过")
         }
-    })
+    } catch (error) {
+        // 处理错误
+        console.error(error);
+        ElNotification({
+            title: 'Error',
+            message: '验证Token时发生错误',
+            type: 'error',
+        });
+        userStore.$reset();
+        return next({ path: LOGIN_URL, replace: true });
+    }
 
     // 6.如果没有菜单列表，就重新请求菜单列表并添加动态路由
     if (!authStore.authMenuListGet.length) {

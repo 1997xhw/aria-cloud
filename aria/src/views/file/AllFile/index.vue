@@ -8,7 +8,7 @@ import {useUserStore} from "@/stores/modules/user.ts";
 interface file {
   filename: string,
   filehash: string,
-  filesize: number,
+  filesize: string,
   updatetime: string,
 }
 
@@ -17,13 +17,14 @@ const tableData = reactive<file[]>([])
 const userStore = useUserStore();
 const getFileList = ()=> {
   getFileAllList(userStore.token,userStore.username).then(res=> {
-    if (res.code==200) {
+    if (res.status==200) {
       console.log(res)
-      res.data.forEach(item=> {
+      let data = res.data.data
+      data.forEach(item=> {
         tableData.push({
           filename: item.file_name,
           filehash: item.file_sha,
-          filesize: item.file_size,
+          filesize: (item.file_size/1024/1024).toFixed(2).toString() + " M",
           updatetime: item.last_update,
         })
       })

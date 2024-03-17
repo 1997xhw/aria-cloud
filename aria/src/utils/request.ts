@@ -1,4 +1,8 @@
-import axios, { AxiosRequestConfig } from 'axios' // 引入axios
+import axios, { AxiosRequestConfig } from 'axios'
+import {showMessage} from "@/utils/status.ts";
+import {ElMessage} from "element-plus";
+import router from "@/routes";
+import {LOGIN_URL} from "@/config"; // 引入axios
 
 const instacne = axios.create({
     timeout: 5000,
@@ -55,10 +59,18 @@ instacne.interceptors.request.use(
 instacne.interceptors.response.use(
     response => {
         // 数据处理等操作
-        return response.data;
+        return response;
     },
     error => {
-        Promise.reject(error);
+        const { response } = error;
+        if (response) {
+            // 请求已发出，但是不在2xx的范围
+            ElMessage.warning(showMessage(response.status)); // 传入响应码，匹配响应码对应信息
+
+            return Promise.reject(response.data);
+        } else {
+            ElMessage.warning("网络连接异常,请稍后再试!");
+        }
     }
 );
 export default request;

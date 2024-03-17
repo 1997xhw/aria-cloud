@@ -47,16 +47,20 @@ const handleLogin = async (formEl: FormInstance | undefined) => {
       // 在这里添加登录逻辑
       // 例如，发送请求到后端验证用户名和密码
       try {
+        loading.value = true
         login(form).then(res => {
-          if (res.code == 200) {
-            userStore.setToken(res.data.token);
-            userStore.setUserInfo(res.data.username);
+          console.log("res: ", res);
+
+          if (res.status == 200) {
+            let data = res.data.data;
+            userStore.setToken(data.token);
+            userStore.setUserInfo(data.username);
             ElNotification({
               title: 'Success',
               message: '登陆成功！',
               type: 'success',
             })
-            console.log(res)
+            // console.log(res)
             router.push(HOME_URL)
           } else {
             ElNotification({
@@ -64,7 +68,7 @@ const handleLogin = async (formEl: FormInstance | undefined) => {
               message: res.msg,
               type: 'error',
             })
-            console.log(res.msg)
+            // console.log(res.msg)
           }
         })
       } finally {

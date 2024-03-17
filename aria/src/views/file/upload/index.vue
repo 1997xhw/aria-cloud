@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import {ref} from 'vue'
-import {genFileId, UploadUserFile, ElMessageBox} from 'element-plus'
+import {genFileId, UploadUserFile, ElMessageBox, ElNotification} from 'element-plus'
 import type {UploadInstance, UploadProps, UploadRawFile} from 'element-plus'
 import {useUserStore} from "@/stores/modules/user.ts";
 import {uloadFile, uploadFile} from "@/api/api.ts";
+import {showMessage} from "@/utils/status.ts";
 
 const upload = ref<UploadInstance>()
+const loading = ref(false);
 
 const fileList = ref<UploadUserFile[]>([])
 const handleExceed: UploadProps['onExceed'] = (files) => {
@@ -15,38 +17,59 @@ const handleExceed: UploadProps['onExceed'] = (files) => {
   upload.value!.handleStart(file)
 }
 const userStore = useUserStore();
+let formData = new FormData()
 const submitUpload = () => {
   // upload.value!.submit()
   formData.append("username", userStore.username)
   formData.append("token", userStore.token)
-  uploadFile(formData).then(res => {
-    if (res.code == 200) {
-      console.log(res.msg)
-      console.log(res)
-    } else {
-      console.log(res.msg)
-    }
-  })
+  if(formData.get("file")==null) {
+    ElNotification({
+      title: '上传状态',
+      message: '请选择至少一个文件！',
+      type: 'warning',
+    })
+    return
+  }
+  try {
+    loading.value=true;
+    uploadFile(formData).then(res => {
+      if (res.status == 200) {
+        ElNotification({
+          title: '上传状态',
+          message: '上传成功',
+          type: 'success',
+        })
+      } else {
+        ElNotification({
+          title: '上传状态',
+          message: res.msg,
+          type: 'error',
+        })
+      }
+    })
+  }finally {
+    loading.value=false;
+  }
+
 }
 
-const progressShu = ref(0) //控制进度条
-const ulpadFile = async (file:any) => {
-
-  var fd = new FormData();
-  fd.append("file", file.file)
-  fd.append("username", userStore.username)
-  fd.append("token", userStore.token)
-
-  const {data} = await uloadFile(fd, (e) => {
-    // isShow.value = true;
-    //计算进度条的值e.loaded当前进度 ,e.total总进度
-    progressShu.value = Number((e.loaded / e.total * 100).toFixed(0))
-
-  })
-
-  // isShow.value = false;
-
-}
+// const progressShu = ref(0) //控制进度条
+// const ulpadFile = async () => {
+//   formData.append("username", userStore.username)
+//   formData.append("token", userStore.token)
+//
+//   uploadFile(formData).then(res => {
+//     if (res.code == 200) {
+//       console.log(res.msg)
+//       console.log(res)
+//     } else {
+//       console.log(res.msg)
+//     }
+//   })
+//
+//   // isShow.value = false;
+//
+// }
 
 const handleRemove: UploadProps['onRemove'] = (file, uploadFiles) => {
   console.log(file, uploadFiles)
@@ -77,7 +100,7 @@ const beforeRemove: UploadProps['beforeRemove'] = (uploadFile) => {
 //
 // }
 
-let formData = new FormData()
+
 const handleChange = (file, fileList) => {
   console.log(file)
   formData.append("file", file.raw)
@@ -119,7 +142,7 @@ const handleChange = (file, fileList) => {
             ref="upload"
             v-model:file-list="fileList"
             action=""
-            :http-request="ulpadFile"
+
             :on-change="handleChange"
             :on-remove="handleRemove"
             :before-remove="beforeRemove"
@@ -133,7 +156,7 @@ const handleChange = (file, fileList) => {
             <el-button>选择文件</el-button>
           </template>
 
-          <el-button class="ml-3" type="success" @click="ulpadFile">上传文件</el-button>
+          <el-button class="ml-3" type="success" @click="submitUpload" :loading="loading">上传文件</el-button>
           <el-button type="danger">删除文件</el-button>
           <el-button type="warning">终止上传</el-button>
         </el-upload>
