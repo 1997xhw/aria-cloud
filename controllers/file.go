@@ -70,3 +70,15 @@ func DeleteFile(c *gin.Context) {
 	}
 
 }
+
+func DownloadFileOss(c *gin.Context) {
+	filename := c.Query("filename")
+	filesha := c.Query("filesha")
+	file, err := services.DownloadFileFromOss(filename, filesha)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"msg": "下载出现异常：" + err.Error()})
+		return
+	}
+	c.Data(http.StatusOK, "application/octet-stream", file)
+}

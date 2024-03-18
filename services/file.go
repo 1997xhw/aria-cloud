@@ -100,6 +100,7 @@ func DeleteFileHandler(username, filehash string) error {
 	}
 	fileSuffix := path.Ext(file.FileName)
 	log.Println(fileSuffix)
+
 	//删除oss上的数据
 	err = ini.DeleteOss(file.FileSha1, fileSuffix)
 	if err != nil {
@@ -107,4 +108,13 @@ func DeleteFileHandler(username, filehash string) error {
 	}
 
 	return nil
+}
+
+func DownloadFileFromOss(filename, filesha string) ([]byte, error) {
+	fileSuffix := path.Ext(filename)
+	fileBytes, err := ini.DownloadOss(filesha, fileSuffix)
+	if err != nil {
+		return nil, err
+	}
+	return fileBytes, nil
 }

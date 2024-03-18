@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import {onMounted, reactive, ref} from "vue";
-import {DeleteFileOne, getFileAllList} from "@/api/api.ts";
+import {DeleteFileOne, DownloadFileOss, getFileAllList} from "@/api/api.ts";
 import {ElMessageBox, ElNotification, ElMessage} from "element-plus";
 import {useUserStore} from "@/stores/modules/user.ts";
-import router from "@/routes";
+
+// import router from "@/routes";
 
 
 interface file {
@@ -48,14 +49,14 @@ const delVis = ref(false)
 
 const DeleteFileHandler = (file: file) => {
   ElMessageBox.confirm(
-      '确认删除文件【 '+file.filename+'】？',
+      '确认删除文件【 ' + file.filename + '】？',
       '注意',
       {
         confirmButtonText: 'OK',
         cancelButtonText: 'Cancel',
         type: 'warning',
       }
-  ).then(()=>{
+  ).then(() => {
     console.log('Deleting file', file)
     delVis.value = false
     let formData = new FormData()
@@ -64,7 +65,7 @@ const DeleteFileHandler = (file: file) => {
     console.log("formData: ", formData.get("username"))
     DeleteFileOne(formData)
         .then(res => {
-          if (res.status==200) {
+          if (res.status == 200) {
             ElNotification({
               title: '删除状态',
               message: '成功',
@@ -80,13 +81,57 @@ const DeleteFileHandler = (file: file) => {
             })
           }
         })
-  }).catch(()=>{
+  }).catch(() => {
     ElMessage({
       type: 'info',
       message: 'Delete canceled',
     })
   })
 
+}
+
+const DownloadFileOssHandler = (file: file) => {
+  ElMessageBox.confirm(
+      '确认下载文件【 ' + file.filename + '】？',
+      '注意',
+      {
+        confirmButtonText: 'OK',
+        cancelButtonText: 'Cancel',
+        type: 'warning',
+      }
+  ).then(() => {
+    DownloadFileOss(file.filehash, file.filename)
+        .then(res => {
+          if (res.status == 200) {
+
+            const url = window.URL.createObjectURL(new Blob([res.data]));
+            // 创建一个链接元素
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', file.filename); // 设置下载文件名
+            document.body.appendChild(link);
+            link.click(); // 程序性地点击链接以触发下载
+            link.remove(); // 清理
+
+            ElNotification({
+              title: '下载状态',
+              message: '成功',
+              type: 'success',
+            })
+          } else {
+            ElNotification({
+              title: '下载状态',
+              message: res.msg,
+              type: 'error',
+            })
+          }
+        })
+  }).catch(() => {
+    ElMessage({
+      type: 'info',
+      message: '下载取消',
+    })
+  })
 }
 
 </script>
@@ -110,22 +155,9 @@ const DeleteFileHandler = (file: file) => {
           <el-table-column prop="updatetime" label="上传时间"></el-table-column>
           <el-table-column label="操作" width="200px">
             <template #default="scope">
-              <el-button type="success" size="default">下载</el-button>
+              <el-button type="success" size="default" @click="DownloadFileOssHandler(scope.row)">下载</el-button>
               <el-button type="danger" size="default" @click="DeleteFileHandler(scope.row)">删除</el-button>
 
-<!--              <el-popover :visible="delVis" placement="top" :width="160">-->
-<!--                <p>Are you sure to delete this?</p>-->
-<!--                <div style="text-align: right; margin: 0">-->
-<!--                  <el-button size="small" text @click="delVis = false">取消</el-button>-->
-<!--                  <el-button size="small" type="primary" @click="DeleteFileHandler(scope.row)"-->
-<!--                  >确认</el-button-->
-<!--                  >-->
-<!--                </div>-->
-<!--                <template #reference>-->
-<!--&lt;!&ndash;                  <el-button @click="visible = true">Delete</el-button>&ndash;&gt;-->
-<!--                  <el-button type="danger" size="default" @click="delVis = true">删除</el-button>-->
-<!--                </template>-->
-<!--              </el-popover>-->
             </template>
           </el-table-column>
         </el-table>

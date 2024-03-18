@@ -1,8 +1,9 @@
 import request from "@/utils/request.ts"
 import authMenuList from '@/assets/json/authMenuList.json';
 import authButtonList from '@/assets/json/authButtonList.json';
+// import {data} from "autoprefixer";
 
-export function login(data :any) {
+export function login(data: any) {
     return request({
         headers: {
             'Content-Type': 'application/json;charset=UTF-8',  //指定消息格式
@@ -12,7 +13,8 @@ export function login(data :any) {
         data: data,
     })
 }
-export function uploadFile(data :FormData) {
+
+export function uploadFile(data: FormData) {
     return request({
         url: '/aria/file/upload',
         method: 'post',
@@ -25,7 +27,7 @@ export function uploadFile(data :FormData) {
     })
 }
 
-export const uloadFile = (data :any,onUploadProgress:any) => {
+export const uloadFile = (data: any, onUploadProgress: any) => {
     return request({
         url: '/aria/file/upload',
         method: 'post',
@@ -33,17 +35,17 @@ export const uloadFile = (data :any,onUploadProgress:any) => {
         onUploadProgress: onUploadProgress
     })
 }
-export const verifyToken = (token :string, username :string)=> {
+export const verifyToken = (token: string, username: string) => {
     return request({
-        url: '/verify?token='+token+'&username=' + username,
+        url: '/verify?token=' + token + '&username=' + username,
         method: 'get',
     })
 }
 
-export const getFileAllList=(token :string, username :string)=> {
+export const getFileAllList = (token: string, username: string) => {
     return request({
-        url:'/aria/file/allList?token='+token+'&username=' + username,
-        method:'get'
+        url: '/aria/file/allList?token=' + token + '&username=' + username,
+        method: 'get'
     })
 }
 
@@ -58,16 +60,24 @@ export const getAuthButtonListApi = () => {
     return authButtonList;
 };
 
-export const DeleteFileOne = (data:FormData)=> {
+export const DeleteFileOne = (data: FormData) => {
     return request({
-        url:"/aria/file/delete",
+        url: "/aria/file/delete",
         method: "POST",
         data: data
     })
 }
 
+export const DownloadFileOss = (filesha: string, filename: string) => {
+    return request({
+        url: "/aria/file/downloadOss?filesha=" + filesha + "&filename=" + filename,
+        method: "GET",
+        responseType: 'blob',
+    })
+}
 
-export function register(data :any) {
+
+export function register(data: any) {
     return request({
         url: '/register',
         method: 'post',
@@ -80,6 +90,4 @@ export const logoutApi = () => {
     return
 };
 
-export default {
-
-}
+export default {}

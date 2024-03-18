@@ -3,6 +3,7 @@ package lib
 import (
 	"aria-cloud/common"
 	"github.com/aliyun/aliyun-oss-go-sdk/oss"
+	"io"
 	"log"
 	"path"
 )
@@ -57,4 +58,31 @@ func DeleteOss(fileHash, fileType string) error {
 	}
 	return nil
 
+}
+
+func DownloadOss(fileHash, fileType string) ([]byte, error) {
+	conf := LoadServerConfig()
+	client, err := oss.New(conf.Endpoint, conf.AccessKeyID, conf.AccessKeySecret)
+	if err != nil {
+		log.Println("Error: ", err)
+		return nil, err
+	}
+
+	bucket, errBucket := client.Bucket(conf.BucketName)
+	if errBucket != nil {
+		log.Println("Error: ", err)
+		return nil, err
+	}
+
+	object, err := bucket.GetObject("test/" + fileHash + fileType)
+	if err != nil {
+		return nil, err
+	}
+	defer object.Close()
+
+	all, err := io.ReadAll(object)
+	if err != nil {
+		return nil, err
+	}
+	return all, nil
 }
