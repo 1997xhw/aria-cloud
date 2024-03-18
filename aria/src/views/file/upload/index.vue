@@ -3,8 +3,7 @@ import {ref} from 'vue'
 import {genFileId, UploadUserFile, ElMessageBox, ElNotification} from 'element-plus'
 import type {UploadInstance, UploadProps, UploadRawFile} from 'element-plus'
 import {useUserStore} from "@/stores/modules/user.ts";
-import {uloadFile, uploadFile} from "@/api/api.ts";
-import {showMessage} from "@/utils/status.ts";
+import { uploadFile} from "@/api/api.ts";
 
 const upload = ref<UploadInstance>()
 const loading = ref(false);
@@ -36,7 +35,7 @@ const submitUpload = () => {
       if (res.status == 200) {
         ElNotification({
           title: '上传状态',
-          message: '上传成功',
+          message: '成功',
           type: 'success',
         })
       } else {

@@ -19,14 +19,12 @@ func Verify(c *gin.Context) {
 	fmt.Println(username, token)
 	err := services.IsTokenVaild(username, token)
 	if err != nil {
-		c.JSON(http.StatusOK, gin.H{
-			"msg":  err.Error(),
-			"code": http.StatusInternalServerError,
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"msg": err.Error(),
 		})
 	} else {
 		c.JSON(http.StatusOK, gin.H{
-			"msg":  "ok",
-			"code": http.StatusOK,
+			"msg": "ok",
 		})
 	}
 }
@@ -50,21 +48,19 @@ func RegiesterHandler(c *gin.Context) {
 	if err := c.ShouldBindJSON(&user); err != nil {
 		//绑定失败
 		fmt.Println("数据绑定失败：", err.Error())
-		c.JSON(http.StatusOK, gin.H{
-			"msg":    "参数格式不正确",
-			"status": 500,
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"msg": "参数格式不正确",
 		})
 	} else {
 		res, err := services.Register(user.Username, user.Password)
 		if res {
 			c.JSON(http.StatusOK, gin.H{
-				"code": http.StatusOK,
-				"msg":  "注册成功",
+				"msg": "注册成功",
 			})
 		} else {
-			c.JSON(http.StatusOK, gin.H{
-				"code": http.StatusInternalServerError,
-				"msg":  err.Error(),
+			c.JSON(http.StatusInternalServerError, gin.H{
+				//"code": http.StatusInternalServerError,
+				"msg": err.Error(),
 			})
 		}
 	}
@@ -78,8 +74,8 @@ func LoginHandler(c *gin.Context) {
 	if err != nil {
 		fmt.Println("数据解析失败：", err.Error())
 		c.JSON(http.StatusOK, gin.H{
-			"msg":    "参数格式不正确",
-			"status": 500,
+			"msg": "参数格式不正确",
+			//"status": 500,
 		})
 	}
 	fmt.Println(m["username"])
@@ -107,17 +103,15 @@ func LoginHandler(c *gin.Context) {
 		fmt.Println(token)
 		_ = services.UpadteUserToken(username, token)
 		c.JSON(http.StatusOK, gin.H{
-			"code": http.StatusOK,
-			"msg":  "登陆成功",
+			"msg": "登陆成功",
 			"data": ReturnData{
 				Username: username,
 				Token:    token,
 			},
 		})
 	} else {
-		c.JSON(http.StatusOK, gin.H{
-			"code": http.StatusInternalServerError,
-			"msg":  err.Error(),
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"msg": err.Error(),
 		})
 	}
 

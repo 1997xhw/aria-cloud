@@ -7,7 +7,7 @@ import {initDynamicRouter} from "@/routes/modules/dynamicRouter.ts";
 import {verifyToken} from "@/api/api.ts";
 import {ElNotification} from "element-plus";
 import {LOGIN_URL} from "@/config";
-
+import { nextTick } from 'vue';
 
 const mode = "hash";
 
@@ -68,9 +68,12 @@ router.beforeEach(async (to, from, next) => {
     if (!authStore.authMenuListGet.length) {
         await initDynamicRouter();
         return next({...to, replace: true});
-    }
+    }else {
+       nextTick(() => {
+            next();
+        })
 
-    next();
+    }
 
 })
 

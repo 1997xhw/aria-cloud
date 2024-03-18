@@ -36,14 +36,12 @@ func UploadFile(c *gin.Context) {
 	err = services.SaveFileHandler(file, username)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"code": http.StatusInternalServerError,
-			"msg":  err.Error(),
+			"msg": err.Error(),
 		})
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"code": http.StatusOK,
-		"msg":  "ok",
+		"msg": "ok",
 	})
 
 	//data := struct {
@@ -53,5 +51,22 @@ func UploadFile(c *gin.Context) {
 	//	Filename: file.Filename,
 	//	Filesize: strconv.FormatInt(file.Size, 10),
 	//}
+
+}
+func DeleteFile(c *gin.Context) {
+	username := c.PostForm("username")
+	filehash := c.PostForm("filehash")
+	err := services.DeleteFileHandler(username, filehash)
+	fmt.Println(username, filehash)
+	if err != nil {
+		log.Println(err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"msg": err.Error(),
+		})
+	} else {
+		c.JSON(http.StatusOK, gin.H{
+			"msg": "ok",
+		})
+	}
 
 }

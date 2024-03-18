@@ -1,8 +1,8 @@
 import axios, { AxiosRequestConfig } from 'axios'
 import {showMessage} from "@/utils/status.ts";
 import {ElMessage} from "element-plus";
-import router from "@/routes";
-import {LOGIN_URL} from "@/config"; // 引入axios
+// import router from "@/routes";
+// import {LOGIN_URL} from "@/config"; // 引入axios
 
 const instacne = axios.create({
     timeout: 5000,

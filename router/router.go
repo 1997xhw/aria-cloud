@@ -2,7 +2,6 @@ package router
 
 import (
 	"aria-cloud/controllers"
-	"aria-cloud/middlewares"
 	"github.com/gin-gonic/gin"
 )
 
@@ -16,11 +15,13 @@ func InitRouter() *gin.Engine {
 	router.POST("/login", controllers.LoginHandler)
 	//router.POST("/file/upload", controllers.UploadFile)
 	aria := router.Group("/aria")
-	aria.Use(middlewares.CheckLogin)
+	//aria.Use(middlewares.CheckLogin)
+	aria.Use()
 	{
 		aria.GET("/home", controllers.UserHome)
 		aria.POST("/file/upload", controllers.UploadFile)
 		aria.GET("/file/allList", controllers.AllFileList)
+		aria.POST("/file/delete", controllers.DeleteFile)
 	}
 
 	return router

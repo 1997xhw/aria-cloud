@@ -16,12 +16,12 @@ export function uploadFile(data :FormData) {
     return request({
         url: '/aria/file/upload',
         method: 'post',
-        data: data,
-        transformRequest:[function (data, headers) {
-            delete headers[ 'Content-Type']
-            return data
-        }
-        ]
+        data: data
+        // transformRequest:[function (data, headers) {
+        //     delete headers[ 'Content-Type']
+        //     return data
+        // }
+        // ]
     })
 }
 
@@ -58,12 +58,17 @@ export const getAuthButtonListApi = () => {
     return authButtonList;
 };
 
+export const DeleteFileOne = (data:FormData)=> {
+    return request({
+        url:"/aria/file/delete",
+        method: "POST",
+        data: data
+    })
+}
+
 
 export function register(data :any) {
     return request({
-        headers: {
-            'Content-Type': 'application/json;charset=UTF-8',  //指定消息格式
-        },
         url: '/register',
         method: 'post',
         data: data,

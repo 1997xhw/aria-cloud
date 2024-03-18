@@ -132,6 +132,19 @@
         "isFull": false,
         "isAffix": true
       }
+    },
+    {
+      "path": "/dehaze/index",
+      "name": "dehaze",
+      "component": "/dehaze/index",
+      "meta": {
+        "icon": "UploadFilled",
+        "title": "去雾",
+        "isLink": "",
+        "isHide": false,
+        "isFull": false,
+        "isAffix": true
+      }
     }
   ],
   "msg": "成功"

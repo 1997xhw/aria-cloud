@@ -16,7 +16,9 @@
     "pinia-plugin-persistedstate": "^3.2.1",
     "screenfull": "^6.0.2",
     "vue": "^3.4.19",
-    "vue-router": "^4.3.0"
+    "vue-compare-image": "^0.2.0",
+    "vue-router": "^4.3.0",
+    "vue3-compare-image": "^1.2.2"
   },
   "devDependencies": {
     "@types/node": "^20.11.20",

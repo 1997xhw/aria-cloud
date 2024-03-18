@@ -25,6 +25,9 @@ import "@/assets/fonts/font.scss";
 
 import pinia from "@/stores";
 
+import VueCompareImage from "vue3-compare-image";
+
+
 
 const app = createApp(App)
 Object.keys(Icons).forEach(key => {
@@ -34,6 +37,7 @@ Object.keys(Icons).forEach(key => {
 app.use(router)
 app.use(pinia)
 app.use(ElementPlus)
+app.use(VueCompareImage)
 app.component('screen-adapter', ScreenAdapter)
 app.mount("#app")
 

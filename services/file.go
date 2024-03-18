@@ -2,18 +2,21 @@ package services
 
 import (
 	"aria-cloud/common"
+	"aria-cloud/databases/mysql"
 	ini "aria-cloud/lib"
 	"aria-cloud/models"
 	"aria-cloud/util"
 	"fmt"
+	"github.com/jinzhu/gorm"
 	"io"
 	"log"
 	"mime/multipart"
 	"os"
+	"path"
 	"time"
 )
 
-func GetAllFileList(username string) ([]models.TableUserFile, error) {
+func GetAllFileList(username string) ([]common.TableUserFile, error) {
 	fileList, err := models.GetAllFileList(username)
 	if err != nil {
 		log.Println(err.Error())
@@ -61,11 +64,44 @@ func SaveFileHandler(file *multipart.FileHeader, username string) error {
 		if err != nil {
 			return err
 		}
+		//上传oss
+		go ini.UploadOss(fileMeta)
 	} else {
 		log.Println("文件已在索引中存在")
 	}
 
 	err = models.OnUserFileUploadFinished(fileMeta, username)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func DeleteFileHandler(username, filehash string) error {
+	var file common.TableUserFile
+	var err error
+	err = mysql.DB.Transaction(func(tx *gorm.DB) error {
+		var err2 error
+		file, err2 = models.SelectTableUserFile(tx, username, filehash)
+		if err2 != nil {
+			return err2
+		}
+
+		err2 = models.DeleteUserFile(tx, username, filehash)
+		if err2 != nil {
+			return err2
+		}
+
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+	fileSuffix := path.Ext(file.FileName)
+	log.Println(fileSuffix)
+	//删除oss上的数据
+	err = ini.DeleteOss(file.FileSha1, fileSuffix)
 	if err != nil {
 		return err
 	}

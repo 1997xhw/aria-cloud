@@ -62,8 +62,8 @@ func IsTokenVaild(username string, token string) error {
 	if err != nil {
 		return err
 	}
-	//fmt.Println("dbtoken: ", dbToken)
-	//fmt.Println("token: ", token)
+	fmt.Println("dbtoken: ", dbToken)
+	fmt.Println("token: ", token)
 	// 3. 对比两个token是否一致
 	if dbToken != token {
 
